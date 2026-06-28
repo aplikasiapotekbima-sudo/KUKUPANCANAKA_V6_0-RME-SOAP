@@ -43,19 +43,19 @@ export default function LoginPageSupabase({ onLogin, clinicName }) {
   return (
     <div style={{
       minHeight: "100svh", width: "100%", display: "flex", alignItems: "center", justifyContent: "center",
-      background: "linear-gradient(135deg, #eff6ff 0%, #f0f4f8 55%, #eef2ff 100%)",
+      background: "#ffffff",
       fontFamily: "var(--font)", padding: 20,
     }}>
       <div style={{ width: "100%", maxWidth: 400 }}>
-        <div style={{ textAlign: "center", marginBottom: 22 }}>
+        <div style={{ textAlign: "center", marginBottom: 0 }}>
           <img
             src={logoMd}
             alt="PANCANAKA"
-            style={{ width: "100%", maxWidth: 360, height: "auto", margin: "0 auto 10px", display: "block", objectFit: "contain" }}
+            style={{ width: "100%", maxWidth: 360, height: "auto", margin: "0 auto", display: "block", objectFit: "contain" }}
           />
         </div>
 
-        <form onSubmit={handleSubmit} className="kk-card" style={{ padding: 26 }}>
+        <form onSubmit={handleSubmit} className="kk-card" style={{ padding: 26, borderTop: "none", borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
           <div className="kk-field-label">Email</div>
           <input
             className="kk-input"
