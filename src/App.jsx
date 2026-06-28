@@ -15,6 +15,7 @@ import LoginPageSupabase from "./pages/auth/LoginPageSupabase";
 import PageAkunSupabase from "./pages/akun/PageAkunSupabase";
 import PatientSelector from "./components/patients/PatientSelector";
 import { restoreSession, signOut as supabaseSignOut } from "./lib/auth";
+import { logoSm } from "./lib/logoAssets";
 
 // ─── STORAGE KEYS ────────────────────────────────────────────────────────────
 const STORAGE_KEYS = {
@@ -2755,9 +2756,9 @@ export default function App() {
       }}>
         {/* Brand */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", marginRight: 24, borderRight: "1.5px solid var(--border-mid)", paddingRight: 24 }}>
-          <div style={{ width: 34, height: 34, background: "var(--blue-bg)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, border: "1.5px solid var(--blue-border)", flexShrink: 0 }}>🏥</div>
+          <img src={logoSm} alt="PANCANAKA" style={{ height: 34, width: "auto", objectFit: "contain", flexShrink: 0 }} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 14.5, color: "var(--text-primary)", lineHeight: 1.2 }}>{settings.clinicName}</div>
+            <div style={{ fontWeight: 800, fontSize: 14.5, color: "var(--text-primary)", lineHeight: 1.2, letterSpacing: 0.5 }}>PANCANAKA</div>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 500 }}>Kasir & E-Resep</div>
           </div>
         </div>

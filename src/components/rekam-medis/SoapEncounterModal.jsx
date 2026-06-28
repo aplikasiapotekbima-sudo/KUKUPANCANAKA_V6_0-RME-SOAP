@@ -171,11 +171,7 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
                     <option key={d.id} value={d.id}>{d.name}</option>
                   ))}
                 </select>
-                {chosenDoctorId && !UUID_RE.test(chosenDoctorId) && (
-                  <div style={{ fontSize: 11.5, color: "#92400e", marginTop: 4 }}>
-                    ⚠️ Data dokter ini berasal dari sistem lama dan tidak akan tertaut ke kolom dokter di database. Untuk menautkan dokter, tambahkan ulang dokter ini di menu <strong>Dokter</strong>.
-                  </div>
-                )}
+
               </Field>
             </div>
           </div>

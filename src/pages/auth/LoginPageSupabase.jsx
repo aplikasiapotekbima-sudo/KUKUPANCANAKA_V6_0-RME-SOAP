@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { signIn } from "../../lib/auth";
+import { logoMd } from "../../lib/logoAssets";
 
 export default function LoginPageSupabase({ onLogin, clinicName }) {
   const [email, setEmail] = useState("");
@@ -47,13 +48,12 @@ export default function LoginPageSupabase({ onLogin, clinicName }) {
     }}>
       <div style={{ width: "100%", maxWidth: 400 }}>
         <div style={{ textAlign: "center", marginBottom: 22 }}>
-          <div style={{
-            width: 58, height: 58, margin: "0 auto 14px", borderRadius: 14,
-            background: "var(--blue-bg)", border: "1.5px solid var(--blue-border)",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28,
-            boxShadow: "var(--shadow-sm)",
-          }}>🏥</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>{clinicName || "Kasir Klinik"}</div>
+          <img
+            src={logoMd}
+            alt="PANCANAKA"
+            style={{ width: 120, height: "auto", margin: "0 auto 10px", display: "block", objectFit: "contain" }}
+          />
+          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", letterSpacing: 1 }}>PANCANAKA</div>
           <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2 }}>Kasir & E-Resep — Masuk untuk melanjutkan</div>
         </div>
 
@@ -65,7 +65,7 @@ export default function LoginPageSupabase({ onLogin, clinicName }) {
             style={{ marginBottom: 16 }}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="dokter@klinikanda.id"
+            placeholder="username@bima.local"
             autoFocus
             autoCapitalize="none"
             autoComplete="username"
