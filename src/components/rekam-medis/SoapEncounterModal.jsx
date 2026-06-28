@@ -81,19 +81,34 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
   const set = (f, v) => setSoap((p) => ({ ...p, [f]: v }));
 
   const handleSubmit = async () => {
+    // Reset state sebelum simpan
     setSaving(true);
     setSaveError("");
+    setJustSaved(false);
+
     const payload = { doctorId: chosenDoctorId || null, soap };
-    const res = isEdit
-      ? await updateEncounter(encounter.id, payload)
-      : await createEncounter({ patientId: patient.id, ...payload });
-    setSaving(false);
-    if (res.error) {
-      setSaveError("Gagal menyimpan SOAP. Periksa koneksi/Supabase lalu coba lagi.");
+    let res;
+    try {
+      res = isEdit
+        ? await updateEncounter(encounter.id, payload)
+        : await createEncounter({ patientId: patient.id, ...payload });
+    } catch (err) {
+      setSaving(false);
+      setSaveError("Terjadi kesalahan tak terduga: " + (err?.message || String(err)));
       return;
     }
+
+    setSaving(false);
+
+    if (res.error) {
+      // Tampilkan pesan error spesifik dari Supabase jika tersedia
+      const detail = res.error?.message || res.error?.details || JSON.stringify(res.error);
+      setSaveError("Gagal menyimpan SOAP: " + detail + ". Periksa koneksi/Supabase lalu coba lagi.");
+      return;
+    }
+
     setJustSaved(true);
-    setTimeout(() => onSaved?.(res.data), 900);
+    setTimeout(() => onSaved?.(res.data), 1200);
   };
 
   return (
@@ -106,9 +121,15 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
       <div style={{
         background: "#fff", borderRadius: "var(--r-lg)", width: 760, maxHeight: "94vh",
         overflowY: "auto", boxShadow: "var(--shadow-lg)",
+        display: "flex", flexDirection: "column",
       }}>
-        {/* Header */}
-        <div style={{ padding: "18px 24px", borderBottom: "1.5px solid var(--border-mid)", display: "flex", alignItems: "center", position: "sticky", top: 0, background: "#fff", zIndex: 1 }}>
+        {/* Header — sticky top */}
+        <div style={{
+          padding: "18px 24px", borderBottom: "1.5px solid var(--border-mid)",
+          display: "flex", alignItems: "center",
+          position: "sticky", top: 0, background: "#fff", zIndex: 10,
+          flexShrink: 0,
+        }}>
           <div>
             <div style={{ fontWeight: 700, fontSize: 16 }}>{isEdit ? "✏️ Ubah Kunjungan (SOAP)" : "🩺 Kunjungan Baru (SOAP)"}</div>
             <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
@@ -118,7 +139,8 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
           <button onClick={onClose} style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "var(--text-muted)" }}>✕</button>
         </div>
 
-        <div style={{ padding: 24 }}>
+        {/* Body — scrollable */}
+        <div style={{ padding: 24, flex: 1, overflowY: "auto" }}>
           {/* Header kunjungan */}
           <div style={{ ...sectionStyle }}>
             <div style={sectionHeaderStyle("#374151", "#f3f4f6")}>📅 Data Kunjungan</div>
@@ -197,7 +219,7 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
           </div>
 
           {/* P */}
-          <div style={{ ...sectionStyle, marginBottom: 18 }}>
+          <div style={{ ...sectionStyle, marginBottom: 0 }}>
             <div style={sectionHeaderStyle("#92400e", "#fffbeb")}>P — Rencana Asuhan (Plan)</div>
             <div style={sectionBodyStyle}>
               <Field label="Terapi">
@@ -213,22 +235,62 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
           </div>
         </div>
 
-        {justSaved && (
-          <div style={{ margin: "0 24px 0", padding: "10px 14px", background: "var(--green-bg)", border: "1.5px solid var(--green-border)", borderRadius: "var(--r-sm)", color: "var(--green-text)", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
-            ✅ SOAP berhasil disimpan!
-          </div>
-        )}
-        {saveError && (
-          <div style={{ margin: "0 24px 0", padding: "10px 14px", background: "var(--red-bg)", border: "1.5px solid var(--red-border)", borderRadius: "var(--r-sm)", color: "var(--red-text)", fontSize: 13, fontWeight: 600 }}>
-            ⚠️ {saveError}
-          </div>
-        )}
+        {/* Footer — sticky bottom, termasuk notifikasi error/sukses */}
+        <div style={{
+          borderTop: "1.5px solid var(--border-mid)",
+          position: "sticky", bottom: 0, background: "#fff",
+          zIndex: 10, flexShrink: 0,
+        }}>
+          {/* Notifikasi sukses */}
+          {justSaved && (
+            <div style={{
+              margin: "12px 24px 0",
+              padding: "10px 14px",
+              background: "#f0fdf4",
+              border: "1.5px solid #86efac",
+              borderRadius: "var(--r-sm)",
+              color: "#166534",
+              fontSize: 13, fontWeight: 600,
+              display: "flex", alignItems: "center", gap: 8,
+            }}>
+              ✅ SOAP berhasil disimpan! Menutup formulir...
+            </div>
+          )}
 
-        <div style={{ padding: "16px 24px", borderTop: "1.5px solid var(--border-mid)", display: "flex", gap: 10, justifyContent: "flex-end", position: "sticky", bottom: 0, background: "#fff" }}>
-          <button className="kk-btn kk-btn-secondary" onClick={onClose} disabled={justSaved}>Batal</button>
-          <button className="kk-btn kk-btn-primary" onClick={handleSubmit} disabled={saving || justSaved}>
-            {saving ? "Menyimpan..." : justSaved ? "✅ Tersimpan" : "💾 Simpan SOAP"}
-          </button>
+          {/* Notifikasi error — selalu terlihat di atas tombol */}
+          {saveError && (
+            <div style={{
+              margin: "12px 24px 0",
+              padding: "10px 14px",
+              background: "#fef2f2",
+              border: "1.5px solid #fca5a5",
+              borderRadius: "var(--r-sm)",
+              color: "#991b1b",
+              fontSize: 13, fontWeight: 600,
+              lineHeight: 1.5,
+            }}>
+              ⚠️ {saveError}
+            </div>
+          )}
+
+          {/* Tombol aksi */}
+          <div style={{ padding: "14px 24px", display: "flex", gap: 10, justifyContent: "flex-end" }}>
+            <button
+              className="kk-btn kk-btn-secondary"
+              onClick={onClose}
+              disabled={saving}
+            >
+              Batal
+            </button>
+            <button
+              className="kk-btn kk-btn-primary"
+              onClick={handleSubmit}
+              disabled={saving || justSaved}
+              style={{ minWidth: 140 }}
+            >
+              {saving ? "⏳ Menyimpan..." : justSaved ? "✅ Tersimpan" : "💾 Simpan SOAP"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

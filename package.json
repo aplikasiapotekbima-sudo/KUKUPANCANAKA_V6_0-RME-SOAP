@@ -1,7 +1,7 @@
 {
   "name": "kasir-klinik",
   "private": true,
-  "version": "5.6.0",
+  "version": "6.2.0",
   "type": "module",
   "engines": {
     "node": ">=18.0.0"

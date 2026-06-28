@@ -1,4 +1,4 @@
-# Kasir Klinik v6.0 — dengan Rekam Medis Terintegrasi
+# Kasir Klinik v6.2 — dengan Rekam Medis Terintegrasi
 
 Project ini **sudah berisi seluruh kode integrasi Rekam Medis (RME)** —
 `App.jsx`, `PageEResepDokter.jsx`, `PageEResepApoteker.jsx`, dan

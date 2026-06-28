@@ -216,10 +216,13 @@ export default function PageRekamMedis({ onCreateRecipeFor, doctors, currentUser
     refreshList(q);
   };
 
-  const handlePatientCreated = (patient) => {
+  const handlePatientCreated = async (patient) => {
     setShowNewPatient(false);
     refreshList(q);
-    openPatient(patient);
+    // Buka data pasien terlebih dahulu, lalu langsung buka formulir SOAP
+    // agar user bisa langsung input kunjungan pertama tanpa harus klik tombol
+    await openPatient(patient);
+    setSoapModal({ encounter: null });
   };
 
   const handleDeleteEncounter = async (enc) => {
