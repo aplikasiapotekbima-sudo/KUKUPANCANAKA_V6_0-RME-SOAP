@@ -75,17 +75,25 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
   const [soap, setSoap] = useState(soapFromEncounter(encounter));
   const [chosenDoctorId, setChosenDoctorId] = useState(encounter?.doctor_id || doctorId || "");
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [justSaved, setJustSaved] = useState(false);
   const isEdit = !!encounter?.id;
   const set = (f, v) => setSoap((p) => ({ ...p, [f]: v }));
 
   const handleSubmit = async () => {
     setSaving(true);
+    setSaveError("");
     const payload = { doctorId: chosenDoctorId || null, soap };
     const res = isEdit
       ? await updateEncounter(encounter.id, payload)
       : await createEncounter({ patientId: patient.id, ...payload });
     setSaving(false);
-    if (!res.error) onSaved?.(res.data);
+    if (res.error) {
+      setSaveError("Gagal menyimpan SOAP. Periksa koneksi/Supabase lalu coba lagi.");
+      return;
+    }
+    setJustSaved(true);
+    setTimeout(() => onSaved?.(res.data), 900);
   };
 
   return (
@@ -94,7 +102,6 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
         position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 1000,
         display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
       }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div style={{
         background: "#fff", borderRadius: "var(--r-lg)", width: 760, maxHeight: "94vh",
@@ -206,10 +213,21 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
           </div>
         </div>
 
+        {justSaved && (
+          <div style={{ margin: "0 24px 0", padding: "10px 14px", background: "var(--green-bg)", border: "1.5px solid var(--green-border)", borderRadius: "var(--r-sm)", color: "var(--green-text)", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+            ✅ SOAP berhasil disimpan!
+          </div>
+        )}
+        {saveError && (
+          <div style={{ margin: "0 24px 0", padding: "10px 14px", background: "var(--red-bg)", border: "1.5px solid var(--red-border)", borderRadius: "var(--r-sm)", color: "var(--red-text)", fontSize: 13, fontWeight: 600 }}>
+            ⚠️ {saveError}
+          </div>
+        )}
+
         <div style={{ padding: "16px 24px", borderTop: "1.5px solid var(--border-mid)", display: "flex", gap: 10, justifyContent: "flex-end", position: "sticky", bottom: 0, background: "#fff" }}>
-          <button className="kk-btn kk-btn-secondary" onClick={onClose}>Batal</button>
-          <button className="kk-btn kk-btn-primary" onClick={handleSubmit} disabled={saving}>
-            {saving ? "Menyimpan..." : "💾 Simpan SOAP"}
+          <button className="kk-btn kk-btn-secondary" onClick={onClose} disabled={justSaved}>Batal</button>
+          <button className="kk-btn kk-btn-primary" onClick={handleSubmit} disabled={saving || justSaved}>
+            {saving ? "Menyimpan..." : justSaved ? "✅ Tersimpan" : "💾 Simpan SOAP"}
           </button>
         </div>
       </div>

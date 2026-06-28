@@ -36,6 +36,7 @@ export default function NewPatientModal({ presetName, onClose, onCreated }) {
   const [form, setForm] = useState(emptyForm(presetName));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [justSaved, setJustSaved] = useState(false);
   const set = (f, v) => setForm((p) => ({ ...p, [f]: v }));
 
   const handleSubmit = async () => {
@@ -51,7 +52,8 @@ export default function NewPatientModal({ presetName, onClose, onCreated }) {
       setError("Gagal menyimpan pasien. Coba lagi.");
       return;
     }
-    onCreated?.(data);
+    setJustSaved(true);
+    setTimeout(() => onCreated?.(data), 900);
   };
 
   return (
@@ -60,7 +62,6 @@ export default function NewPatientModal({ presetName, onClose, onCreated }) {
         position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 1000,
         display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
       }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div style={{
         background: "#fff", borderRadius: "var(--r-lg)", width: 680, maxHeight: "92vh",
@@ -134,6 +135,11 @@ export default function NewPatientModal({ presetName, onClose, onCreated }) {
           </Field>
         </div>
 
+        {justSaved && (
+          <div style={{ margin: "0 24px 14px", padding: "10px 14px", background: "var(--green-bg)", border: "1.5px solid var(--green-border)", borderRadius: "var(--r-sm)", color: "var(--green-text)", fontSize: 13, fontWeight: 600 }}>
+            ✅ Pasien berhasil didaftarkan!
+          </div>
+        )}
         {error && (
           <div style={{ margin: "0 24px 14px", padding: "8px 12px", background: "var(--red-bg)", border: "1.5px solid var(--red-border)", borderRadius: "var(--r-sm)", color: "var(--red-text)", fontSize: 12.5, fontWeight: 500 }}>
             ⚠️ {error}
@@ -141,9 +147,9 @@ export default function NewPatientModal({ presetName, onClose, onCreated }) {
         )}
 
         <div style={{ padding: "16px 24px", borderTop: "1.5px solid var(--border-mid)", display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button className="kk-btn kk-btn-secondary" onClick={onClose}>Batal</button>
-          <button className="kk-btn kk-btn-primary" onClick={handleSubmit} disabled={saving}>
-            {saving ? "Menyimpan..." : "💾 Simpan & Daftarkan"}
+          <button className="kk-btn kk-btn-secondary" onClick={onClose} disabled={justSaved}>Batal</button>
+          <button className="kk-btn kk-btn-primary" onClick={handleSubmit} disabled={saving || justSaved}>
+            {saving ? "Menyimpan..." : justSaved ? "✅ Tersimpan" : "💾 Simpan & Daftarkan"}
           </button>
         </div>
       </div>
