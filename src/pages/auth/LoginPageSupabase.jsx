@@ -51,10 +51,8 @@ export default function LoginPageSupabase({ onLogin, clinicName }) {
           <img
             src={logoMd}
             alt="PANCANAKA"
-            style={{ width: 120, height: "auto", margin: "0 auto 10px", display: "block", objectFit: "contain" }}
+            style={{ width: "100%", maxWidth: 360, height: "auto", margin: "0 auto 10px", display: "block", objectFit: "contain" }}
           />
-          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", letterSpacing: 1 }}>PANCANAKA</div>
-          <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2 }}>Kasir & E-Resep — Masuk untuk melanjutkan</div>
         </div>
 
         <form onSubmit={handleSubmit} className="kk-card" style={{ padding: 26 }}>
@@ -102,9 +100,6 @@ export default function LoginPageSupabase({ onLogin, clinicName }) {
           </button>
         </form>
 
-        <div style={{ textAlign: "center", marginTop: 16, fontSize: 11.5, color: "var(--text-muted)" }}>
-          Login kini lewat Supabase Auth — setiap aksi tercatat di audit trail.
-        </div>
       </div>
     </div>
   );
