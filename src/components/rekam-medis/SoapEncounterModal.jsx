@@ -71,6 +71,8 @@ function Field({ label, children, cols }) {
   );
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export default function SoapEncounterModal({ patient, encounter, doctors, doctorId, onClose, onSaved }) {
   const [soap, setSoap] = useState(soapFromEncounter(encounter));
   const [chosenDoctorId, setChosenDoctorId] = useState(encounter?.doctor_id || doctorId || "");
@@ -80,13 +82,18 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
   const isEdit = !!encounter?.id;
   const set = (f, v) => setSoap((p) => ({ ...p, [f]: v }));
 
+  // Dokter dari localStorage lama pakai id "1", "2", dst — bukan UUID.
+  // Supabase menolak nilai non-UUID untuk kolom uuid. Kirim null jika
+  // id yang dipilih bukan format UUID valid.
+  const safeUuid = (v) => (v && UUID_RE.test(v) ? v : null);
+
   const handleSubmit = async () => {
     // Reset state sebelum simpan
     setSaving(true);
     setSaveError("");
     setJustSaved(false);
 
-    const payload = { doctorId: chosenDoctorId || null, soap };
+    const payload = { doctorId: safeUuid(chosenDoctorId), soap };
     let res;
     try {
       res = isEdit
@@ -164,6 +171,11 @@ export default function SoapEncounterModal({ patient, encounter, doctors, doctor
                     <option key={d.id} value={d.id}>{d.name}</option>
                   ))}
                 </select>
+                {chosenDoctorId && !UUID_RE.test(chosenDoctorId) && (
+                  <div style={{ fontSize: 11.5, color: "#92400e", marginTop: 4 }}>
+                    ⚠️ Data dokter ini berasal dari sistem lama dan tidak akan tertaut ke kolom dokter di database. Untuk menautkan dokter, tambahkan ulang dokter ini di menu <strong>Dokter</strong>.
+                  </div>
+                )}
               </Field>
             </div>
           </div>
